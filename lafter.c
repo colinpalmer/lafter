@@ -51,14 +51,14 @@ int main(int argc, char **argv){
   fftw_plan_with_nthreads(nthread);
 
   // Allocate memory for maps
-  double *ri1 = fftw_alloc_real(r_st);
-  double *ri2 = fftw_alloc_real(r_st);
-  double *ro1 = fftw_alloc_real(r_st);
-  double *ro2 = fftw_alloc_real(r_st);
-  fftw_complex *ki1 = fftw_alloc_complex(k_st);
-  fftw_complex *ki2 = fftw_alloc_complex(k_st);
-  fftw_complex *ko1 = fftw_alloc_complex(k_st);
-  fftw_complex *ko2 = fftw_alloc_complex(k_st);
+  double *ri1 = fftw_malloc(r_st);
+  double *ri2 = fftw_malloc(r_st);
+  double *ro1 = fftw_malloc(r_st);
+  double *ro2 = fftw_malloc(r_st);
+  fftw_complex *ki1 = fftw_malloc(k_st);
+  fftw_complex *ki2 = fftw_malloc(k_st);
+  fftw_complex *ko1 = fftw_malloc(k_st);
+  fftw_complex *ko2 = fftw_malloc(k_st);
   
   // Make FFTW plans
   printf("\n\t FFTW doing its thing - ");
