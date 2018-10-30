@@ -123,6 +123,7 @@ int main(int argc, char **argv){
 
   // Noise suppression loop
   printf("\n\t Suppressing noise -- Pass 1\n\n");
+  fflush(stdout);
   do {
 
     bandpass_filter(ki1, ko1, tail, xyz);
@@ -137,6 +138,7 @@ int main(int argc, char **argv){
     mean_p = suppress_noise(ri1, ri2, ro1, ro2, mask, tail, xyz);
 
     printf("\t Resolution = %12.6g | MeanProb = %12.6g | FSC = %12.6g\n", tail->res + tail->stp, mean_p, tail->fsc);
+    fflush(stdout);
 
 #ifdef DEBUG
     if (args->cut == -1.0){
@@ -182,6 +184,7 @@ int main(int argc, char **argv){
 
   // Output result
   printf("\n\t Writing diagnostic MRC file\n");
+  fflush(stdout);
   char *name1 = ".tmp.mrc";
   memset(ko1, 0, k_st);
   add_fft(ki1, ko1, xyz);
@@ -202,6 +205,7 @@ int main(int argc, char **argv){
 
   // Truncate by SNR
   printf("\n\t De-noising volume -- Pass 2\n\n");
+  fflush(stdout);
   do {
 
     lowpass_filter(ki1, ko1, tail, xyz);
@@ -213,6 +217,7 @@ int main(int argc, char **argv){
     mean_p = truncate_map(ri1, ri2, ro1, mask, tail, args, xyz);
 
     printf("\t Resolution = %12.6g | Recovery = %12.6g\n", tail->res + tail->stp, mean_p);
+    fflush(stdout);
 
     if (tail->prv == NULL){
       break;
@@ -256,6 +261,7 @@ int main(int argc, char **argv){
 
   // Output final volume
   printf("\n\t Outputing denoised MRC file\n");
+  fflush(stdout);
   char *name2 = "lafter.mrc";
   write_upsampled(ki1, max_res, mask, name2, args, xyz);
 
