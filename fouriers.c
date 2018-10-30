@@ -61,10 +61,10 @@ void bandpass_filter(fftw_complex *in, fftw_complex *out, list *node, int32_t fu
     for(int _j = 0, j = 0; _j < full; _j++, j = (_j < size) ? _j : _j - full){
       jd = ((double) j) / dim;
       for(int _i = THREAD, i = THREAD; _i < size; _i += STEP, i = _i){
-	id = ((double) i) / dim;
-	norms = kd * kd + jd * jd + id * id;
-	out[index] = in[index] * ((1.0 / (1.0 + pow((norms / hires), 8.0))) - (1.0 / (1.0 + pow((norms / lores), 8.0))));
-	index++;
+        id = ((double) i) / dim;
+        norms = kd * kd + jd * jd + id * id;
+        out[index] = in[index] * ((1.0 / (1.0 + pow((norms / hires), 8.0))) - (1.0 / (1.0 + pow((norms / lores), 8.0))));
+        index++;
       }
     }
   }
@@ -84,10 +84,10 @@ void lowpass_filter(fftw_complex *in, fftw_complex *out, list *node, int32_t ful
     for(int _j = 0, j = 0; _j < full; _j++, j = (_j < size) ? _j : _j - full){
       jd = ((double) j) / dim;
       for(int _i = THREAD, i = THREAD; _i < size; _i += STEP, i = _i){
-	id = ((double) i) / dim;
-	norms = kd * kd + jd * jd + id * id;
-	out[index] = in[index] * (1.0 / (1.0 + pow((norms / hires), 8.0)));
-	index++;
+        id = ((double) i) / dim;
+        norms = kd * kd + jd * jd + id * id;
+        out[index] = in[index] * (1.0 / (1.0 + pow((norms / hires), 8.0)));
+        index++;
       }
     }
   }

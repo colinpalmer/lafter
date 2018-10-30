@@ -17,40 +17,40 @@ CMAKE input kindly provided by C Palmer - CCPEM - 24/09/2018
 
 ## LAFTER Algorithm
 - LAFTER requires the independent unfiltered halfmaps for agreement
-	 estimation, and any and all masks used for the refinement process
-	 to identify regions where the noise has been down-weighted.
+  estimation, and any and all masks used for the refinement process
+  to identify regions where the noise has been down-weighted.
 - LAFTER performs two passes over the volume, the first from low to
-	 high resolution for noise minimisation, and the second from high
-	 to low, to filter each voxel at the point of agreement.
+  high resolution for noise minimisation, and the second from high
+  to low, to filter each voxel at the point of agreement.
 - Each successive resolution shell is incorporated using an adaptive
-	 step size proportional to both the current resolution, and the SNR
-	 between halves, minimising the step size at low resolution, where
-	 the signal varies strongly, and near the resolution-limit, as the
-	 noise eclipses the signal.
+  step size proportional to both the current resolution, and the SNR
+  between halves, minimising the step size at low resolution, where
+  the signal varies strongly, and near the resolution-limit, as the
+  noise eclipses the signal.
 - The incorporation of new resolution shells terminates when the FSC
-	 between the masked halfmaps reaches either 0.143 (default), or the
-	 user provided FSC cut-off ( --fsc fsc_cut-off e.g. 0.5 ).
+  between the masked halfmaps reaches either 0.143 (default), or the
+  user provided FSC cut-off ( --fsc fsc_cut-off e.g. 0.5 ).
 - The final density maps are then explicitly lowpass filtered at the
-	 resolution cut-off to truncate the resolution at this point.
+  resolution cut-off to truncate the resolution at this point.
 - The working density map is updated at each resolution shell at the
-	 Gaussian estimate of the noise distribution, the variance of which
-	 is calculated from the differences between each pair of halfmaps.
+  Gaussian estimate of the noise distribution, the variance of which
+  is calculated from the differences between each pair of halfmaps.
 - The first pass over increasing resolution suppresses noise in each
-	 halfmap by weighting each voxel in each shell by the probability
-	 that it is part of the noise distribution. This can be thought of
-	 as “adaptive masking”.
+  halfmap by weighting each voxel in each shell by the probability
+  that it is part of the noise distribution. This can be thought of
+  as “adaptive masking”.
 - During a second pass the degree of overfitting is estimated at the
-	 resolution limit and the noise cut-off raised proportionally. Then
-	 the two noise-weighted half-maps are combined at decreasing total
-	 resolution and each voxel lowpass filtered at the maximum value of
-	 the observed noise distribution to attempt to avoid the carry-over
-	 of any noise into the final volume.
+  resolution limit and the noise cut-off raised proportionally. Then
+  the two noise-weighted half-maps are combined at decreasing total
+  resolution and each voxel lowpass filtered at the maximum value of
+  the observed noise distribution to attempt to avoid the carry-over
+  of any noise into the final volume.
 
 ## Calculation of CRef and comparison to LAFTER-density FSC
 - The theoretical value of CRef is calculated between the unfiltered
-halfsets according to the equation of Henderson and Rosenthal: `double Cref = sqrt((2 * FSC) / (1 + FSC))`
+  halfsets according to the equation of Henderson and Rosenthal: `double Cref = sqrt((2 * FSC) / (1 + FSC))`
 - Here the FSC refers to the half-set FSC. Cref is compared to the
-cross FSC (xFSC) between the summed dataset and the output of the LAFTER algorithm.
+  cross FSC (xFSC) between the summed dataset and the output of the LAFTER algorithm.
 - All FSCs are calculated with masked densities in every instance.
 
 ## Installation and License

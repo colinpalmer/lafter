@@ -54,7 +54,7 @@ int main(int argc, char **argv){
   double *ri1 = fftw_alloc_real(r_st);
   double *ri2 = fftw_alloc_real(r_st);
   double *ro1 = fftw_alloc_real(r_st);
-  double *ro2 = fftw_alloc_real(r_st);  
+  double *ro2 = fftw_alloc_real(r_st);
   fftw_complex *ki1 = fftw_alloc_complex(k_st);
   fftw_complex *ki2 = fftw_alloc_complex(k_st);
   fftw_complex *ko1 = fftw_alloc_complex(k_st);
@@ -146,12 +146,12 @@ int main(int argc, char **argv){
 
     if ((tail->res + tail->stp) > max_res || tail->fsc < args->cut){
       if (args->ovfit != 1.0 && tail->stp < 0.0625){
-	max_res = tail->res;
-	tail = end_list(tail);
-	continue;
+        max_res = tail->res;
+        tail = end_list(tail);
+        continue;
       } else {
-	max_res = tail->res;
-	break;
+        max_res = tail->res;
+        break;
       }
     }
 

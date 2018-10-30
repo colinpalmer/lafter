@@ -49,21 +49,21 @@ double truncate_map(double *in1, double *in2, double *out, r_mrc *mask, list *no
     do {
       n = 0;
       for (i = THREAD; i < full; i += STEP){
-	if (mask->data[i] < 0.99){
-	  continue;
-	}
-	cur = in1[i] + in2[i];
-	cor = cur * cur;
-	if (cor > args->ovfit * noise){
-	  n++;
-	}
+        if (mask->data[i] < 0.99){
+          continue;
+        }
+        cur = in1[i] + in2[i];
+        cor = cur * cur;
+        if (cor > args->ovfit * noise){
+          n++;
+        }
       }
       if (((double) n) / count > 0.025){
-	m++;
-	args->ovfit *= 2.0;
+        m++;
+        args->ovfit *= 2.0;
       } else {
-	printf("\t ESTIMATED OVERFITING %i-fold \n\n", m);
-	break;
+        printf("\t ESTIMATED OVERFITING %i-fold \n\n", m);
+        break;
       }
     } while (1);
   }

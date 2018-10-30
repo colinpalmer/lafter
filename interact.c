@@ -82,7 +82,7 @@ arguments *parse_args(int argc, char **argv){
       args->cut = atof(argv[i + 1]);
 #ifndef DEBUG
       if (args->cut < 0.1 || args->cut > 1.0){
-	args->cut = 0.143;
+        args->cut = 0.143;
       }
 #endif
       printf("    LAFTER will use this figure as the FSC cut-off at which no new resolution shells are incorporated. The default is 0.143 \n\n");
@@ -283,10 +283,10 @@ r_mrc *make_msk(r_mrc *in, arguments *args){
       j = (double) _j - cen;
       j = j * j;
       for(int32_t _i = 0; _i < size; _i++){
-	i = (double) _i - cen;
-	i = i * i;
-	norm = (double) k + j + i;
-	out->data[ind++] = 1.0 / (1.0 + pow((norm / args->rad), 8.0));
+        i = (double) _i - cen;
+        i = i * i;
+        norm = (double) k + j + i;
+        out->data[ind++] = 1.0 / (1.0 + pow((norm / args->rad), 8.0));
       }
     }
   }

@@ -39,13 +39,13 @@ void soften_map(double *in, double *out, int32_t size){
   for (k = 0; k < 8; k++){
     for (i = 0; i < cub; i++){
       if (in[i] != 0.0){
-	out[i] = in[i];
-	continue;
+        out[i] = in[i];
+        continue;
       }
       mean = 0;
       k = 0;
       for (j = 0; j < 6; j++){
-	mean += in[(cub + i + neighbours[j]) % (cub)];
+        mean += in[(cub + i + neighbours[j]) % (cub)];
       }
       out[i] = mean / 6.0;
     }
@@ -87,18 +87,18 @@ void write_upsampled(fftw_complex *in, double res, r_mrc *mask, char *name, argu
     kd = kd * kd;
     for(int32_t j = 0; j < full; j++){
       if(j > cut1 && j <= cut2){
-	continue;
+        continue;
       }
       jd = ((double) ((j > size) ? j - full: j)) / dim;
       jd = jd * jd;
       for(int i = THREAD; i < half; i += STEP){
-	if (i > cut1){
-	  continue;
-	}
-	id = ((double) i) / dim;
-	id = id * id;
-	norms = kd + jd + id;
-	ks[(k * full * half + j * half + i)] = in[index++] * (pow(2.0, (8.0 * norms * args->sharp)) / (1.0 + pow((norms / hires), 8.0)));
+        if (i > cut1){
+          continue;
+        }
+        id = ((double) i) / dim;
+        id = id * id;
+        norms = kd + jd + id;
+        ks[(k * full * half + j * half + i)] = in[index++] * (pow(2.0, (8.0 * norms * args->sharp)) / (1.0 + pow((norms / hires), 8.0)));
       }
     }
   }
