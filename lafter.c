@@ -66,13 +66,13 @@ int main(int argc, char **argv){
   fftw_plan fft_ro1_ki1 = fftw_plan_dft_r2c_3d(xyz, xyz, xyz, ro1, ki1, FFTW_MEASURE);
   printf("#");
   fflush(stdout);
-  fftw_plan fft_ro2_ki2 = fftw_plan_dft_r2c_3d(xyz, xyz, xyz, ro2, ki2, FFTW_MEASURE);
+  fftw_plan fft_ro2_ki2 = fftw_plan_dft_r2c_3d(xyz, xyz, xyz, ro2, ki2, FFTW_ESTIMATE);
   printf("#");
   fflush(stdout);
   fftw_plan fft_ko1_ri1 = fftw_plan_dft_c2r_3d(xyz, xyz, xyz, ko1, ri1, FFTW_MEASURE);
   printf("#");
   fflush(stdout);
-  fftw_plan fft_ko2_ri2 = fftw_plan_dft_c2r_3d(xyz, xyz, xyz, ko2, ri2, FFTW_MEASURE);
+  fftw_plan fft_ko2_ri2 = fftw_plan_dft_c2r_3d(xyz, xyz, xyz, ko2, ri2, FFTW_ESTIMATE);
   printf("#\n");
   fflush(stdout);
 
@@ -159,6 +159,11 @@ int main(int argc, char **argv){
 
   } while (1);
 
+  // ri1, ri2, ko2 are not needed for a while
+  fftw_free(ri1);
+  fftw_free(ri2);
+  fftw_free(ko2);
+
   // Apply masks in situ
   apply_mask(mask, ro1);
   apply_mask(mask, ro2);
@@ -166,6 +171,10 @@ int main(int argc, char **argv){
   // Back-transform noise-suppressed maps
   fftw_execute(fft_ro1_ki1);
   fftw_execute(fft_ro2_ki2);
+
+  // ro1, ro2 are not needed for a while
+  fftw_free(ro1);
+  fftw_free(ro2);
 
   // Zero centre
   ki1[0] = 0.0 + 0.0I;
@@ -179,11 +188,19 @@ int main(int argc, char **argv){
   add_fft(ki2, ko1, xyz);
   write_upsampled(ko1, max_res, mask, name1, args, xyz);
 
-  // Zero fill maps
+  // ro1 is needed again now, along with its FFT plan
+  ro1 = fftw_malloc(r_st);
+  fft_ro1_ki1 = fftw_plan_dft_r2c_3d(xyz, xyz, xyz, ro1, ki1, FFTW_ESTIMATE);
   memset(ro1, 0, r_st);
-  memset(ro2, 0, r_st);
 
-  // Truncate by SNR 
+  // ri1, ri2, ko2 are needed again now, along with their FFT plans
+  ri1 = fftw_malloc(r_st);
+  ri2 = fftw_malloc(r_st);
+  ko2 = fftw_malloc(k_st);
+  fft_ko1_ri1 = fftw_plan_dft_c2r_3d(xyz, xyz, xyz, ko1, ri1, FFTW_ESTIMATE);
+  fft_ko2_ri2 = fftw_plan_dft_c2r_3d(xyz, xyz, xyz, ko2, ri2, FFTW_ESTIMATE);
+
+  // Truncate by SNR
   printf("\n\t De-noising volume -- Pass 2\n\n");
   do {
 
@@ -205,6 +222,19 @@ int main(int argc, char **argv){
 
   } while (1);
 
+  // ri1, ri2 are not needed again
+  fftw_free(ri1);
+  fftw_free(ri2);
+
+  // ko1, ko2 are not needed for a while
+  fftw_free(ko1);
+  fftw_free(ko2);
+
+  // ro2 is needed again now, along with its FFT plan
+  ro2 = fftw_malloc(r_st);
+  fft_ro2_ki2 = fftw_plan_dft_r2c_3d(xyz, xyz, xyz, ro2, ki2, FFTW_ESTIMATE);
+  memset(ro2, 0, r_st);
+
   // Soften map ro1
   soften_map(ro1, ro2, xyz);
 
@@ -221,17 +251,25 @@ int main(int argc, char **argv){
   fftw_execute(fft_ro1_ki1);
   fftw_execute(fft_ro2_ki2);
 
+  // ro2 is not needed again
+  fftw_free(ro2);
+
   // Output final volume
   printf("\n\t Outputing denoised MRC file\n");
   char *name2 = "lafter.mrc";
-  memset(ko1, 0, k_st);
-  add_fft(ki1, ko1, xyz);
-  write_upsampled(ko1, max_res, mask, name2, args, xyz);
+  write_upsampled(ki1, max_res, mask, name2, args, xyz);
 
   //#ifdef DEBUG
   char *name3 = "lafter_non-upsampled.mrc";
   write_mrc(mask, ro1, name3, xyz);
   //#endif
+
+  // ro1 is not needed again
+  fftw_free(ro1);
+
+  // ko1, ko2 are needed again now
+  ko1 = fftw_malloc(k_st);
+  ko2 = fftw_malloc(k_st);
 
   // Output quality curves
   int n;
