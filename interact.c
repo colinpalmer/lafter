@@ -1,23 +1,26 @@
-/*                                                                       
- * Copyright 10/12/2017 - Dr. Christopher H. S. Aylett                   
- *                                                                       
- * This program is free software; you can redistribute it and/or modify  
- * it under the terms of version 3 of the GNU General Public License as  
- * published by the Free Software Foundation.                            
- *                                                                       
- * This program is distributed in the hope that it will be useful,       
- * but WITHOUT ANY WARRANTY; without even the implied warranty of        
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         
- * GNU General Public License for more details - YOU HAVE BEEN WARNED!   
- *                                                                       
- * Program: LAFTER V1.0                                                  
- *                                                                       
- * Authors: Chris Aylett                                                 
- *                                                                       
+
+/*                                                                         
+ * Copyright 10/12/2017 - Dr. Christopher H. S. Aylett                     
+ *                                                                         
+ * This program is free software; you can redistribute it and/or modify    
+ * it under the terms of version 3 of the GNU General Public License as    
+ * published by the Free Software Foundation.                              
+ *                                                                         
+ * This program is distributed in the hope that it will be useful,         
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of          
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           
+ * GNU General Public License for more details - YOU HAVE BEEN WARNED!     
+ *                                                                         
+ * Program: LAFTER V1.1                                                    
+ *                                                                         
+ * Authors: Chris Aylett                                                   
+ *          Colin Palmer                                                   
+ *                                                                         
  */
 
 // Library header inclusion for linking                                  
 #include "lafter.h"
+#include "interact.h"
 
 int get_num_jobs(void){
   // Obtain thread number from environmental variables
@@ -41,7 +44,7 @@ int get_num_jobs(void){
 arguments *parse_args(int argc, char **argv){
   // Print usage and disclaimer
   if (argc < 7){
-    printf("\n    Usage: %s --v1 half_map1.mrc --v2 half_map2.mrc ( --mask mask.mrc || --rad voxel_radius )[ --sharp ][ --fsc cut_off ][ --correct_overfitting ]\n", argv[0]);
+    printf("\n    Usage: %s --v1 half_map1.mrc --v2 half_map2.mrc ( --mask mask.mrc || --particle_diameter diameter )[ --sharp ][ --fsc cut_off ][ --downsample ][ --overfitting ]\n", argv[0]);
   }
 
   printf("\n\n\n");
@@ -56,9 +59,15 @@ arguments *parse_args(int argc, char **argv){
   printf("                     \\|____________|\\|______|\\|______|\\|______|            \\|______|      \\|___________|\\|______| \\|______|\n\n\n\n");
 
   printf("    PLEASE NOTE: LAFTER absolutely requires the unfiltered halfmaps and mask used for processing - anything else is invalid\n");
+  printf("                 If a diameter for a spherical mask was specified during refinement, not a specific mask, please provide it\n\n");
+  printf("                 If the argument --sharp is specified, LAFTER will sharpen the output map further than is usually necessary\n\n");
+  printf("                 The argument --fsc specifies a value of the FSC at which LAFTER should halt other than 0.143 - the default\n\n");
+  printf("                 If --downsample is set LAFTER outputs a map at the original scale - only recommended if maps are too large\n\n");
+  printf("                 If your refinement suffers from overfitting --overfitting attempts to mitigate against the effects of this\n");
+  printf("                 mitigation is not fullproof however, and we would suggest that rerefinement is the best idea in most cases\n\n");
   printf("                 The output maps from LAFTER are incompatible with atomic coordinate refinement but will aid model building\n");
   printf("                 Junk in = Junk out is one thing we will guarantee. Report any bugs to c.aylett@imperial.ac.uk - good luck!\n\n");
-  printf("    LAFTER v1.0: Noise suppression and SNR filtering - header correct on 14-06-2018 - GNU licensed - K Ramlaul & CHS Aylett\n\n");
+  printf("    LAFTER v1.1: Noise suppression and SNR filtering - 01-11-2018 GNU Public Licensed - K Ramlaul, CM Palmer and CHS Aylett\n\n");
 
   // Capture user requested settings
   int i;
@@ -68,6 +77,7 @@ arguments *parse_args(int argc, char **argv){
   args->cut = 0.143;
   args->sharp = 0.0;
   args->ovfit = 1.0;
+  args->ups = 2;
   for (i = 1; i < argc; i++){
     if (!strcmp(argv[i], "--v1") && ((i + 1) < argc)){
       args->vol1 = argv[i + 1];
@@ -75,7 +85,7 @@ arguments *parse_args(int argc, char **argv){
       args->vol2 = argv[i + 1];
     } else if (!strcmp(argv[i], "--mask") && ((i + 1) < argc)){
       args->mask = argv[i + 1];
-    } else if (!strcmp(argv[i], "--correct_overfitting")){
+    } else if (!strcmp(argv[i], "--overfitting")){
       args->ovfit = 0.0;
       printf("    LAFTER will attempt to correct overfitting. This can be used if residual noise is visible, but we recommend re-refining \n\n");
     } else if (!strcmp(argv[i], "--fsc") && ((i + 1) < argc)){
@@ -86,22 +96,25 @@ arguments *parse_args(int argc, char **argv){
       }
 #endif
       printf("    LAFTER will use this figure as the FSC cut-off at which no new resolution shells are incorporated. The default is 0.143 \n\n");
-    } else if (!strcmp(argv[i], "--rad") && ((i + 1) < argc)){
+    } else if (!strcmp(argv[i], "--particle_diameter") && ((i + 1) < argc)){
       args->rad = atof(argv[i + 1]);
+      args->rad /= 2.0;
       if (args->rad < 10.0){
-        printf("    Necessary maps not found or not specified LAFTER requires both volumes and mask - set --rad when refined without a mask \n\n");
-        printf("    Radius was not specified correctly - a float or integer value in voxels is required. Divide by Å/pixel if mask set in Å \n\n");
+        printf("    Diameter was not specified correctly - a float or integer value in voxels is required. Divide by Å/pixel if diameter set in Å \n\n");
         exit(1);
       }
       args->mask = argv[i];
       printf("    LAFTER will soft mask the map at this radius in voxels. Please note that if refinement was masked you MUST use the mask \n\n");
     } else if (!strcmp(argv[i], "--sharp")){
       args->sharp = 1.0;
-      printf("    LAFTER will sharpen the output map after the last cycle. This will not affect the FSC or any of the statistics provided \n\n");
+      printf("    LAFTER will sharpen the output map after the last cycle. This is typically unnecessary but can provide marginal benefit \n\n");
+    } else if (!strcmp(argv[i], "--downsample")){
+      args->ups = 1;
+      printf("    LAFTER will not upsample the output map. This is typically only necessary if you have insuffucient memory or your map is very large \n\n");
     }
   }
   if (args->vol1 == NULL || args->vol2 == NULL || args->mask == NULL){
-    printf("    Necessary maps not found or not specified LAFTER requires both volumes and mask - set --rad when refined without a mask \n\n");
+    printf("    Necessary maps not found or not specified - LAFTER requires both volumes and mask, or a diameter when refined without a mask \n\n");
     exit(1);
   }
   return args;
@@ -182,6 +195,11 @@ r_mrc *read_mrc(char *filename){
   }
   fread(header->data, sizeof(float), (header->n_crs[0] * header->n_crs[1] * header->n_crs[2]), f);
   fclose(f);
+  if (header->length_xyz[0] < 1e-9 || header->length_xyz[1] < 1e-9 || header->length_xyz[2] < 1e-9){
+    header->length_xyz[0] = (float) header->n_xyz[0];
+    header->length_xyz[1] = (float) header->n_xyz[1];
+    header->length_xyz[2] = (float) header->n_xyz[2];
+  }
   return header;
 }
 
@@ -267,46 +285,130 @@ void write_mrc(r_mrc* header, double *vol, char* filename, int32_t size){
 }
 
 // Make mask from radius in voxels
-r_mrc *make_msk(r_mrc *in, arguments *args){
+r_mrc *make_msk(r_mrc *in, arguments *args, int32_t nthreads){
   r_mrc *out = malloc(sizeof(r_mrc));
-  int32_t size = in->n_crs[0];
-  int32_t ind = 0;
+  int32_t size = in->n_crs[0], i;
   args->rad *= args->rad;
-  double i, j, k, cen = (double) size / 2;
-  double norm;
+  double cen = (double) size / 2;
   memcpy(out, in, sizeof(r_mrc));
   out->data = calloc(size * size * size, sizeof(float));
-  for(int32_t _k = 0; _k < size; _k++){
-    k = (double) _k - cen;
-    k = k * k;
-    for(int32_t _j = 0; _j < size; _j++){
-      j = (double) _j - cen;
-      j = j * j;
-      for(int32_t _i = 0; _i < size; _i++){
-        i = (double) _i - cen;
-        i = i * i;
-        norm = (double) k + j + i;
-        out->data[ind++] = 1.0 / (1.0 + pow((norm / args->rad), 8.0));
-      }
+  pthread_t threads[nthreads];
+  make_mask_arg arg[nthreads];
+  // Start threads
+  for (i = 0; i < nthreads; i++){
+    arg[i].args = args;
+    arg[i].out = out;
+    arg[i].size = size;
+    arg[i].size_2 = size * size;
+    arg[i].cen = cen;
+    arg[i].step = nthreads;
+    arg[i].thread = i;
+    if (pthread_create(&threads[i], NULL, (void*) make_mask_thread, &arg[i])){
+      printf("\nThread initialisation failed!\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+  // Join threads
+  for (i = 0; i < nthreads; i++){
+    if (pthread_join(threads[i], NULL)){
+      printf("\nThread failed during run!\n");
+      fflush(stdout);
+      exit(1);
     }
   }
   return out;
 }
 
+void make_mask_thread(make_mask_arg *arg){
+  double i, j, k, norm;
+  for(int32_t _k = 0; _k < arg->size; _k++){
+    k = (double) _k - arg->cen;
+    k = k * k;
+    for(int32_t _j = 0; _j < arg->size; _j++){
+      j = (double) _j - arg->cen;
+      j = j * j;
+      for(int32_t _i = arg->thread; _i < arg->size; _i += arg->step){
+        i = (double) _i - arg->cen;
+        i = i * i;
+        norm = (double) k + j + i;
+        arg->out->data[ _k * arg->size_2 + _j * arg->size + _i ] = 1.0 / sqrt(1.0 + pow((norm / arg->args->rad), 8.0));
+      }
+    }
+  }
+  return;
+}
+
 // Add MRC map in to out
-void add_map(r_mrc *in, double *out){
-  int32_t i, max = in->n_crs[0] * in->n_crs[1] * in->n_crs[2];
-  for (i = 0; i < max; i++){
-    out[i] += (double) in->data[i];
+void add_map(r_mrc *in, double *out, int32_t nthreads){
+  int32_t size = in->n_crs[0] * in->n_crs[1] * in->n_crs[2], i;
+  pthread_t threads[nthreads];
+  map_arg arg[nthreads]; 
+  // Start threads
+  for (i = 0; i < nthreads; i++){
+    arg[i].in = in;
+    arg[i].out = out;
+    arg[i].size = size;
+    arg[i].step = nthreads;
+    arg[i].thread = i;
+    if (pthread_create(&threads[i], NULL, (void*) add_map_thread, &arg[i])){
+      printf("\nThread initialisation failed!\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+  // Join threads
+  for (i = 0; i < nthreads; i++){
+    if (pthread_join(threads[i], NULL)){
+      printf("\nThread failed during run!\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+  return;
+}
+
+void add_map_thread(map_arg *arg){
+  int32_t i;
+  for (i = arg->thread; i < arg->size; i += arg->step){
+    arg->out[i] += (double) arg->in->data[i];
   }
   return;
 }
 
 // Multiply out by in elementwise
-void apply_mask(r_mrc *in, double *out){
-  int32_t i, max = in->n_crs[0] * in->n_crs[1] * in->n_crs[2];
-  for (i = 0; i < max; i++){
-    out[i] *= (double) in->data[i];
+void apply_mask(r_mrc *in, double *out, int32_t nthreads){
+  int32_t size = in->n_crs[0] * in->n_crs[1] * in->n_crs[2], i;
+  pthread_t threads[nthreads];
+  map_arg arg[nthreads]; 
+  // Start threads
+  for (i = 0; i < nthreads; i++){
+    arg[i].in = in;
+    arg[i].out = out;
+    arg[i].size = size;
+    arg[i].step = nthreads;
+    arg[i].thread = i;
+    if (pthread_create(&threads[i], NULL, (void*) apply_mask_thread, &arg[i])){
+      printf("\nThread initialisation failed!\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+  // Join threads
+  for (i = 0; i < nthreads; i++){
+    if (pthread_join(threads[i], NULL)){
+      printf("\nThread failed during run!\n");
+      fflush(stdout);
+      exit(1);
+    }
+  }
+  return;
+}
+
+void apply_mask_thread(map_arg *arg){
+  int32_t i;
+  for (i = arg->thread; i < arg->size; i += arg->step){
+    arg->out[i] *= (double) arg->in->data[i];
   }
   return;
 }
