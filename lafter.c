@@ -143,7 +143,7 @@ int main(int argc, char **argv){
 
     mean_p = suppress_noise(ri1, ri2, ro1, ro2, mask, tail, xyz, nthread);
 
-    printf("\t Resolution = %12.6g | MeanProb = %12.6g | FSC = %12.6g\n", apix / (tail->res + tail->stp), mean_p, tail->fsc);
+    printf("\t Resolution = %12.6f | MeanProb = %12.6f | FSC = %12.6f\n", apix / (tail->res + tail->stp), mean_p, tail->fsc);
     fflush(stdout);
 
 #ifdef DEBUG
@@ -223,7 +223,7 @@ int main(int argc, char **argv){
 
     mean_p = truncate_map(ri1, ri2, ro1, mask, tail, args, xyz, nthread);
 
-    printf("\t Resolution = %12.6g | Recovery = %12.6g\n", apix / (tail->res + tail->stp), mean_p);
+    printf("\t Resolution = %12.6f | Recovery = %12.6f\n", apix / (tail->res + tail->stp), mean_p);
     fflush(stdout);
 
     if (tail->prv == NULL){
@@ -290,13 +290,13 @@ int main(int argc, char **argv){
 
     tail->fsc = calc_fsc(ko1, ko2, xyz, nthread);
 
-    printf("\n\t Resolution = %12.6g | Cref = %12.6g - ", apix / (tail->res + tail->stp), tail->crf);
+    printf("\n\t Resolution = %12.6f | Cref = %12.6f - ", apix / (tail->res + tail->stp), tail->crf);
     for (n = 0; n < (int)(50 * tail->crf); n++){
       printf(">");
       fflush(stdout);
     }
 
-    printf("\n\t                           | xFSC = %12.6g - ", tail->fsc);
+    printf("\n\t                           | xFSC = %12.6f - ", tail->fsc);
     for (n = 0; n < (int)(50 * tail->fsc); n++){
       printf("#");
       fflush(stdout);
