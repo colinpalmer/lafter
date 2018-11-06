@@ -64,7 +64,7 @@ arguments *parse_args(int argc, char **argv){
   printf("                 The argument --fsc specifies a value of the FSC at which LAFTER should halt other than 0.143 - the default\n\n");
   printf("                 If --downsample is set LAFTER outputs a map at the original scale - only recommended if maps are too large\n\n");
   printf("                 If your refinement suffers from overfitting --overfitting attempts to mitigate against the effects of this\n");
-  printf("                 mitigation is not fullproof however, and we would suggest that rerefinement is the best idea in most cases\n\n");
+  printf("                 Mitigation is not foolproof however and we would suggest that re-refinement is the best idea in most cases\n\n");
   printf("                 The output maps from LAFTER are incompatible with atomic coordinate refinement but will aid model building\n");
   printf("                 Junk in = Junk out is one thing we will guarantee. Report any bugs to c.aylett@imperial.ac.uk - good luck!\n\n");
   printf("    LAFTER v1.1: Noise suppression and SNR filtering - 01-11-2018 GNU Public Licensed - K Ramlaul, CM Palmer and CHS Aylett\n\n");
@@ -100,7 +100,7 @@ arguments *parse_args(int argc, char **argv){
       args->rad = atof(argv[i + 1]);
       args->rad /= 2.0;
       if (args->rad < 10.0){
-        printf("    Diameter was not specified correctly - a float or integer value in voxels is required. Divide by Å/pixel if diameter set in Å \n\n");
+        printf("    Diameter was not specified correctly or is too small. A float or integer value in voxels is required. Divide by Å/pixel if diameter set in Å \n\n");
         exit(1);
       }
       args->mask = argv[i];
@@ -110,7 +110,7 @@ arguments *parse_args(int argc, char **argv){
       printf("    LAFTER will sharpen the output map after the last cycle. This is typically unnecessary but can provide marginal benefit \n\n");
     } else if (!strcmp(argv[i], "--downsample")){
       args->ups = 1;
-      printf("    LAFTER will not upsample the output map. This is typically only necessary if you have insuffucient memory or your map is very large \n\n");
+      printf("    LAFTER will not upsample the output map. This is typically only necessary if you have insufficient memory or your map is very large \n\n");
     }
   }
   if (args->vol1 == NULL || args->vol2 == NULL || args->mask == NULL){

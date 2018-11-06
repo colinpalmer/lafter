@@ -80,7 +80,7 @@ double truncate_map(double *in1, double *in2, double *out, r_mrc *mask, list *no
         m++;
         args->ovfit *= 2.0;
       } else {
-        printf("\t ESTIMATED OVERFITING %i-fold \n\n", m);
+        printf("\t ESTIMATED OVERFITTING %i-fold \n\n", m);
         break;
       }
     } while (1);

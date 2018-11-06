@@ -126,6 +126,7 @@ int main(int argc, char **argv){
 
   // Noise suppression loop
   printf("\n\t Suppressing noise -- Pass 1 \n");
+  printf("\n\t # Resolution is in ångströms (Å) ");
   printf("\n\t # MeanProb records the estimated probability voxels are not noise ");
   printf("\n\t # FSC indicates the Fourier Shell Correlation between half sets -\n\n");
   fflush(stdout);
@@ -210,7 +211,7 @@ int main(int argc, char **argv){
 
   // Truncate by SNR
   printf("\n\t De-noising volume -- Pass 2 \n");
-  printf("\n\t # recovery indicates the fraction of the mask recovered by the current resolution -\n\n");
+  printf("\n\t # Recovery indicates the fraction of the mask recovered by the current resolution -\n\n");
   fflush(stdout);
   do {
 
@@ -281,7 +282,7 @@ int main(int argc, char **argv){
   // Output quality curves
   int n;
   printf("\n\t Comparing Half set Cref to the LAFTER-Sum cross-FSC \n");
-  printf("\n\t # these curves should be very close until cut-off: if they differ greatly treat the results with care - \n");
+  printf("\n\t # These curves should be very close until cut-off: if they differ greatly treat the results with care - \n");
   do {
 
     bandpass_filter(ki1, ko1, tail, xyz, nthread);
