@@ -50,6 +50,7 @@ int main(int argc, char **argv){
 
   // FFTW set-up
   printf("\n\t Setting up threads and maps\n");
+  printf("\n\t Using %i threads. If you want to override this, set the OMP_NUM_THREADS environment variable.\n", nthread);
   fftw_init_threads();
   fftw_plan_with_nthreads(nthread);
 
