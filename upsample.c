@@ -42,17 +42,17 @@ void soften_map(double *in, double *out, int32_t size, int32_t nthreads){
       arg[i].in = in;
       arg[i].out = out;
       if (pthread_create(&threads[i], NULL, (void*) soften_map_thread, &arg[i])){
-	printf("\nThread initialisation failed!\n");
-	fflush(stdout);
-	exit(1);
+        printf("\nThread initialisation failed!\n");
+        fflush(stdout);
+        exit(1);
       }
     }
     // Join threads
     for (i = 0; i < nthreads; i++){
       if (pthread_join(threads[i], NULL)){
-	printf("\nThread failed during run!\n");
-	fflush(stdout);
-	exit(1);
+        printf("\nThread failed during run!\n");
+        fflush(stdout);
+        exit(1);
       }
     }
     tmp = in;
@@ -151,8 +151,8 @@ void upsample_map_thread(ups_arg *arg){
         id = ((double) i) / arg->dim;
         id = id * id;
         norms = kd + jd + id;
-	out_i = ((arg->ups_size + kk) % arg->ups_size) * arg->ups_full_half_size + ((arg->ups_size + jj) % arg->ups_size) * arg->ups_half_size + i;
-	in_i = k * arg->full_half_size + j * arg->half_size + i;
+        out_i = ((arg->ups_size + kk) % arg->ups_size) * arg->ups_full_half_size + ((arg->ups_size + jj) % arg->ups_size) * arg->ups_half_size + i;
+        in_i = k * arg->full_half_size + j * arg->half_size + i;
         arg->out[out_i] = arg->in[in_i] * (pow(2.0, (8.0 * norms * arg->args->sharp)) / sqrt(1.0 + pow((norms / arg->hires), 8.0)));
       }
     }

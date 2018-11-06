@@ -223,7 +223,7 @@ void write_mrc(r_mrc* header, double *vol, char* filename, int32_t size){
 
   // Calculate new min, max and mean figures for header
   header->d_min = header->data[0];
-  header->d_max = header->data[0]; 
+  header->d_max = header->data[0];
   for (i = 0; i < total; i++){
     current = (double) header->data[i];
     if (current < header->d_min){
@@ -343,7 +343,7 @@ void make_mask_thread(make_mask_arg *arg){
 void add_map(r_mrc *in, double *out, int32_t nthreads){
   int32_t size = in->n_crs[0] * in->n_crs[1] * in->n_crs[2], i;
   pthread_t threads[nthreads];
-  map_arg arg[nthreads]; 
+  map_arg arg[nthreads];
   // Start threads
   for (i = 0; i < nthreads; i++){
     arg[i].in = in;
@@ -380,7 +380,7 @@ void add_map_thread(map_arg *arg){
 void apply_mask(r_mrc *in, double *out, int32_t nthreads){
   int32_t size = in->n_crs[0] * in->n_crs[1] * in->n_crs[2], i;
   pthread_t threads[nthreads];
-  map_arg arg[nthreads]; 
+  map_arg arg[nthreads];
   // Start threads
   for (i = 0; i < nthreads; i++){
     arg[i].in = in;

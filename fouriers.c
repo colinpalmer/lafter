@@ -26,7 +26,7 @@
 void add_fft(fftw_complex *in, fftw_complex *out, int32_t full, int32_t nthreads){
   int32_t size = full * full * (full / 2 + 1), i;
   pthread_t threads[nthreads];
-  add_fft_arg arg[nthreads]; 
+  add_fft_arg arg[nthreads];
   // Start threads
   for (i = 0; i < nthreads; i++){
     arg[i].in = in;
@@ -62,7 +62,7 @@ void add_fft_thread(add_fft_arg *arg){
 double calc_fsc(fftw_complex *half1, fftw_complex *half2, int32_t full, int32_t nthreads){
   int32_t size = full * full * (full / 2 + 1), i;
   pthread_t threads[nthreads];
-  calc_fsc_arg arg[nthreads]; 
+  calc_fsc_arg arg[nthreads];
   // Start threads
   for (i = 0; i < nthreads; i++){
     arg[i].half1 = half1;
@@ -155,7 +155,7 @@ void bandpass_filter_thread(filter_arg* arg){
       for(int _i = arg->thread, i = arg->thread; _i < arg->size; _i += arg->step, i = _i){
         id = ((double) i) / arg->dim;
         norms = kd * kd + jd * jd + id * id;
-	index = _k * arg->full_size + _j * arg->size + _i;
+        index = _k * arg->full_size + _j * arg->size + _i;
         arg->out[index] = arg->in[index] * (sqrt(1.0 / (1.0 + pow((norms / arg->hires), 8.0))) - sqrt(1.0 / (1.0 + pow((norms / arg->lores), 8.0))));
       }
     }
@@ -211,7 +211,7 @@ void lowpass_filter_thread(filter_arg *arg){
         id = ((double) i) / arg->dim;
         norms = kd * kd + jd * jd + id * id;
         index = _k * arg->full_size + _j * arg->size + _i;
-	arg->out[index] = arg->in[index] * sqrt(1.0 / (1.0 + pow((norms / arg->hires), 8.0)));
+        arg->out[index] = arg->in[index] * sqrt(1.0 / (1.0 + pow((norms / arg->hires), 8.0)));
       }
     }
   }
