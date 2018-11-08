@@ -51,7 +51,8 @@ typedef struct{
   double       *in2;
   double      *out1;
   double      *out2;
-  double        snr;
+  double      p_snr;
+  double      q_snr;
   double res_stp_sd;
   long double     p;
   long double noise;

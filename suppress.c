@@ -61,7 +61,7 @@ double suppress_noise(double *in1, double *in2, double *out1, double *out2, r_mr
   }
   noise /= count;
   power /= count;
-  double snr = fabsl(1.0 - noise / power);
+  double psnr = fabsl(1.0 - noise / power);
   double rmsd = sqrtl(power);
   // Correct according to probability and power
   prob_arg arg2[nthreads];
@@ -72,9 +72,10 @@ double suppress_noise(double *in1, double *in2, double *out1, double *out2, r_mr
     arg2[i].in2 = in2;
     arg2[i].out1 = out1;
     arg2[i].out2 = out2;
-    arg2[i].snr = snr;
+    arg2[i].p_snr = psnr;
+    arg2[i].q_snr = 1.0 - psnr;
     arg2[i].res_stp_sd = node->stp / rmsd;
-    arg2[i].noise = noise;
+    arg2[i].noise = sqrt(2.0 * noise);
     arg2[i].p = 0.0;
     arg2[i].size = max;
     arg2[i].step = nthreads;
@@ -118,10 +119,12 @@ void calc_noise_signal_thread(cns_arg *arg){
 
 void probability_correct_thread(prob_arg *arg){
   int32_t i;
-  double cor, cur;
+  double cor, cur, cdf;
   for (i = arg->thread; i < arg->size; i += arg->step){
-    cor = arg->in1[i] + arg->in2[i];
-    cur = (1.0 - exp(-0.50 * ((cor * cor) / arg->noise))) * arg->snr;
+    cor = fabs(arg->in1[i] + arg->in2[i]) / arg->noise;
+    cdf = erf(cor);
+    cur = cdf * arg->p_snr;
+    cur = cur / (cur + (1.0 - cdf) * arg->q_snr);
     if(arg->mask->data[i] > 0.99){
       arg->p += cur;
     }
