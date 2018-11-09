@@ -65,7 +65,7 @@ arguments *parse_args(int argc, char **argv){
   printf("                 If --downsample is set LAFTER outputs a map at the original scale - only recommended if maps are too large\n\n");
   printf("                 If your refinement suffers from overfitting --overfitting attempts to mitigate against the effects of this\n");
   printf("                 Mitigation is not foolproof however and we would suggest that re-refinement is the best idea in most cases\n\n");
-  printf("                 The output maps from LAFTER are incompatible with atomic coordinate refinement but will aid model building\n");
+  printf("                 The output maps from LAFTER are incompatible with atomic coordinate refinement but will aid model building\n\n");
   printf("                 Junk in = Junk out is one thing we will guarantee. Report any bugs to c.aylett@imperial.ac.uk - good luck!\n\n");
   printf("    LAFTER v1.1: Noise suppression and SNR filtering - 01-11-2018 GNU Public Licensed - K Ramlaul, CM Palmer and CHS Aylett\n\n");
 
@@ -100,7 +100,7 @@ arguments *parse_args(int argc, char **argv){
       args->rad = atof(argv[i + 1]);
       args->rad /= 2.0;
       if (args->rad < 10.0){
-        printf("    Diameter was not specified correctly or is too small. A float or integer value in voxels is required. Divide by Å/pixel if diameter set in Å \n\n");
+        printf("    Particle diameter is not a number or is too small. A numerical value measured in voxels and greater than 20 is required \n\n");
         exit(1);
       }
       args->mask = argv[i];
@@ -110,11 +110,11 @@ arguments *parse_args(int argc, char **argv){
       printf("    LAFTER will sharpen the output map after the last cycle. This is typically unnecessary but can provide marginal benefit \n\n");
     } else if (!strcmp(argv[i], "--downsample")){
       args->ups = 1;
-      printf("    LAFTER will not upsample the output map. This is typically only necessary if you have insufficient memory or your map is very large \n\n");
+      printf("    LAFTER will not upsample the output map. This is typically only necessary if the map is large and you run out of memory \n\n");
     }
   }
   if (args->vol1 == NULL || args->vol2 == NULL || args->mask == NULL){
-    printf("    Necessary maps not found or not specified - LAFTER requires both volumes and mask, or a diameter when refined without a mask \n\n");
+    printf("    Necessary maps not found or not specified - LAFTER requires two half-set volumes and either a mask or particle diameter \n\n");
     exit(1);
   }
   return args;
