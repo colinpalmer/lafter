@@ -121,6 +121,10 @@ void calc_max_noise_thread(max_arg *arg){
   int32_t i;
   double cor, cur;
   for (i = arg->thread; i < arg->size; i += arg->step){
+    // Normalise input transforms first
+    arg->in1[i] = arg->in1[i] / arg->size;
+    arg->in2[i] = arg->in2[i] / arg->size;
+    // Do not calculate statistics from voxels outside the mask
     if (arg->mask->data[i] < 0.99){
       continue;
     }

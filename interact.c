@@ -218,7 +218,8 @@ void write_mrc(r_mrc* header, double *vol, char* filename, int32_t size){
     exit(1);
   }
   for (i = 0; i < total; i++){
-    header->data[i] = (float) vol[i];
+    // Divide by total to normalise data values (assuming this is always called after an IFFT)
+    header->data[i] = (float) (vol[i] / total);
   }
 
   // Calculate new min, max and mean figures for header
