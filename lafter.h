@@ -33,7 +33,9 @@
 
 /* Type definitions */
 
+#ifndef NDEBUG
 #define DEBUG
+#endif
 
 // Arguments
 typedef struct {
