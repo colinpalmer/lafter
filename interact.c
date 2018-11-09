@@ -230,7 +230,7 @@ void write_mrc(r_mrc* header, double *vol, char* filename, int32_t size){
       header->d_min = (float) current;
     }
     if (current > header->d_max){
-      header->d_min = (float) current;
+      header->d_max = (float) current;
     }
     sum += current;
   }
