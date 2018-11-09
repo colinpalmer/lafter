@@ -6,14 +6,14 @@ __KAILASH RAMLAUL, COLIN PALMER & CHRISTOPHER H S AYLETT - 01/11/2018__
 ## TL-DR:
 - LAFTER is a local filter for single particle TEM reconstructions
 - LAFTER requires FFTW3 compiled with POSIX threads for compilation
-- LAFTER is a C99 program (the compilation script is included)
+- LAFTER is a C99 program (a compilation script is included)
 - LAFTER prints all its available options to stdout when called
 - LAFTER requires independent half-volumes and mask from refinement
 - If no explicit mask was used give diameter to which noise remains
 - LAFTER reports the Cref and LAFTER-sum xFSC curves as validation
 - LAFTER outputs a twofold upsampled MRC volume for interpretation
 - The output of LAFTER is INCOMPATIBLE with coordinate refinement
-- overfitting will occur if this is tried as the maps are denoised
+- Overfitting will occur if this is tried as the maps are denoised
 
 
 ## LAFTER Algorithm
@@ -54,6 +54,16 @@ __KAILASH RAMLAUL, COLIN PALMER & CHRISTOPHER H S AYLETT - 01/11/2018__
 ## Installation and License
 - LAFTER is a performance optimised C program using FFTW3 in Fourier
   transformation (Frigo and Johnson, 2005) for speed and portability
+- Compilation is easiest with CMake. Build and run LAFTER with these
+  commands:
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+./lafter
+```
+
 - LAFTER is open source and is made available under the GNU public
   license, which should be included in any package.
 
