@@ -1,6 +1,6 @@
 
 # LAFTER [ Local Agreement Filter for Transmission EM Reconstructions ]
-__KAILASH RAMLAUL, COLIN PALMER & CHRISTOPHER H S AYLETT - 01/11/2018__
+__KAILASH RAMLAUL, COLIN PALMER & CHRISTOPHER H S AYLETT - 14/11/2018__
 
 
 ## TL-DR:

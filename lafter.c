@@ -127,7 +127,7 @@ int main(int argc, char **argv){
 
   // Noise suppression loop
   printf("\n\t Suppressing noise -- Pass 1 \n");
-  printf("\n\t # Resolution is in ångströms (Å) ");
+  printf("\n\t # Resolution is reported in Ångströms [Å] everywhere it is quoted ");
   printf("\n\t # MeanProb records the estimated probability voxels are not noise ");
   printf("\n\t # FSC indicates the Fourier Shell Correlation between half sets -\n\n");
   fflush(stdout);
@@ -212,7 +212,8 @@ int main(int argc, char **argv){
 
   // Truncate by SNR
   printf("\n\t De-noising volume -- Pass 2 \n");
-  printf("\n\t # Recovery indicates the fraction of the mask recovered by the current resolution -\n\n");
+  printf("\n\t # Recovery indicates the fraction of the mask recovered by the current resolution");
+  printf("\n\t # This should reach at least 1.0 but will preferably end up considerably higher -\n\n");
   fflush(stdout);
   do {
 
@@ -268,9 +269,9 @@ int main(int argc, char **argv){
   fftw_free(ro2);
 
   // Output final volume
-  printf("\n\t Outputing denoised MRC file\n");
+  printf("\n\t Outputing noise truncated MRC file\n");
   fflush(stdout);
-  char *name2 = "denoised.mrc";
+  char *name2 = "LAFTER_filtered.mrc";
   write_upsampled(ki1, max_res, mask, name2, args, xyz, nthread);
 
   // ro1 is not needed again
@@ -282,6 +283,7 @@ int main(int argc, char **argv){
 
   // Output quality curves
   int n;
+  double diff, dist = 0.0, rmsd = 0.0;
   printf("\n\t Comparing Half set Cref to the LAFTER-Sum cross-FSC \n");
   printf("\n\t # These curves should be very close until cut-off: if they differ greatly treat the results with care - \n");
   do {
@@ -303,6 +305,10 @@ int main(int argc, char **argv){
       fflush(stdout);
     }
 
+    diff = (tail->crf - tail->fsc);
+    rmsd += diff * diff * tail->stp;
+    dist += tail->stp;
+
     if ((tail->res + tail->stp) > max_res){
       break;
     }
@@ -311,6 +317,10 @@ int main(int argc, char **argv){
     tail = tail->nxt;
 
   } while (1);
+
+  // Report RMSD between Cref and xFSC
+  printf("\n\n\n\t RMSD between the half-set Cref and LAFTER-Sum cross-FSC  -  %3.6f", sqrt(rmsd / dist));
+  fflush(stdout);
 
   // Over and out...
   printf("\n\n\n\t ++++ ++++ That's All Folks! ++++ ++++ \n\n\n");
