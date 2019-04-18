@@ -191,8 +191,11 @@ int main(int argc, char **argv){
 
   // Output result
   printf("\n\t Writing noise suppressed MRC file\n");
+  if (args->ups > 1) {
+    printf("\n\t Allocating memory for up-sampled output file. If this fails, try again with the --downsample option\n");
+  }
   fflush(stdout);
-  char *name1 = "noise_suppressed.mrc";
+  char *name1 = "diagnostic_noise_suppressed.mrc";
   memset(ko1, 0, k_st);
   add_fft(ki1, ko1, xyz, nthread);
   add_fft(ki2, ko1, xyz, nthread);
@@ -269,7 +272,7 @@ int main(int argc, char **argv){
   fftw_free(ro2);
 
   // Output final volume
-  printf("\n\t Outputing noise truncated MRC file\n");
+  printf("\n\t Writing noise truncated MRC file\n");
   fflush(stdout);
   char *name2 = "LAFTER_filtered.mrc";
   write_upsampled(ki1, max_res, mask, name2, args, xyz, nthread);
